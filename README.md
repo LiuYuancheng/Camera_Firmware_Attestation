@@ -56,7 +56,7 @@ Raspberry PI3B+ with Camera module. https://projects.raspberrypi.org/en/projects
 
 #### 3. System Design
 
-Communication Protocol 
+###### Communication Protocol 
 
 | The camera client+server and the PATT check+verifier will communicate with each other by UDP with different port. |
 | ------------------------------------------------------------ |
@@ -65,16 +65,44 @@ Communication Protocol
 | PATT checker [ UDP server port: 5006]  <= Random address list <= PATT verifier [UDP client] |
 | PATT checker [ UDP server port: 5006]  => cameraClient PATT value => PATT verifier [UDP client] |
 
+![](doc/RM_comm.png)
+
+###### Program File List 
+
+| Program File    | Execution Env | Description                                                  |
+| --------------- | ------------- | ------------------------------------------------------------ |
+| cameraClient.py | python3.7     | This module will create a client program running on raspberry PI to capture the camera image and feed the image back to connected camera server. |
+| cameraServer.py | python3.7     | This module will create a camera viewer server to connect to the <camClient> by UDP client, get the camera video and do the motion detection and simple target tracking. |
+| pattChecker.py  | python3.7     | This module will create a camera firmware PATT checking function. |
+| pattClient.py   | python3.7     | This module create a file PATT check client and feed back the PATT value when the server connect and send address list to it. |
+| pattServer.py   | python3.7     | This module will create a PATT file checker program. It will send the PATT bytes check list to the client and compare the feedback PATT value. |
+| udpCom.py       | python3.7     | This module will provide a UDP client and server communication API. |
+| udpComTest.py   | python3.7     | This module will provide a muti-thread test case program to test  the UDP communication modules by using port 5005. |
+| firmwareSample  |               | firmware sample file used in test mode.                      |
+| my_video.h264   |               | H264 video used to show the attacked situation.              |
+
+------
+
+#### 4. Program Usage
+
+###### Run the Program
+
+Run the program on Raspberry PI : 
+
+```
+python cameraClient.py
+python pattClient.py
+```
+
+Run the program on Computer : 
+
+```
+python cameraServer.py
+python pattServer.py
+```
 
 
 
+------
 
-
-
-
-
-
-
-
-
-> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 18/03/2020
+> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 26/03/2020
