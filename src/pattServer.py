@@ -12,28 +12,44 @@
 # Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
 # License:     YC
 #-----------------------------------------------------------------------------
-
+import time
 import udpCom
 import pattChecker as patt
 
 UDP_PORT = 5006
 TEST_MD = True # test mode flag
-FM_PATH = "firmwareSample" # Firmware path need to check.
+CONFIG_FILE = 'pattServerConfig.txt'
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class pattServer(object):
-    def __init__(self, clientIP=None):
+    def __init__(self, parent):
         """ Create a UDP server and feed back the checked file's PATT value 
             when the client connect to it.
-            Init example: checker = pattServer(clientIP='127.0.0.1')
+            Init example: checker = pattServer(None)
         """
-        blockNum = 4
+        self.paramDict = self.loadConfig()
         # Init the PATT calculator.
-        self.verifier = patt.pattChecker(blockNum, FM_PATH)
+        self.verifier = patt.pattChecker(self.paramDict['BLKNU'], self.paramDict['FMPAT'])
         # Init the communicate UDP client.
-        if clientIP is None: clientIP = '127.0.0.1' 
-        self.client = udpCom.udpClient((clientIP, UDP_PORT))
+        self.client = udpCom.udpClient((self.paramDict['IPADD'], UDP_PORT))
+
+    #-----------------------------------------------------------------------------
+    def loadConfig(self):
+        """ load the config parameter from the config file."""
+        paramDict = {   'IPADD': '127.0.0.1',       # IPaddress
+                        'BLKNU': 4,                 # display frame rate
+                        'FMPAT': 'firmwareSample',  # Checked firmware name
+        }
+        with open(CONFIG_FILE, "r") as fh:
+            lines = fh.readlines()
+            for line in lines:
+                line = line.rstrip()
+                if line == '' or line[0] == '#': continue
+                key, val = line.split(':')
+                paramDict[key] = int(val) if key == 'BLKNU' else val
+        return paramDict
+
 
 #-----------------------------------------------------------------------------
     def run(self):
@@ -56,9 +72,10 @@ class pattServer(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    clientip = '127.0.0.1' if TEST_MD else "172.27.142.65"
-    pattSer = pattServer(clientIP = clientip)
+    pattSer = pattServer(None)
     pattSer.run()
+    print('Finished')
+    time.sleep(10)
 
 #-----------------------------------------------------------------------------
 if __name__ == '__main__':
