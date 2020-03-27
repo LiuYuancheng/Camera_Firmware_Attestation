@@ -28,23 +28,37 @@ UDP_PORT = 5005
 BUFFER_SZ = udpCom.BUFFER_SZ
 CONFIG_FILE = 'camServerConfig.txt'
 
-TEST_MD = True  # test mode flag
-FRAME_RT = 10   # camera frame rate
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class camServer(object):
-    def __init__(self, camIP):
+    def __init__(self, parent):
         """ Init the image fetch UDP client and motion detection handler.
-            Init example : cam = camServer(camIP='172.27.142.65')
+            Init example : cam = camServer(None)
         """
-        self.client = udpCom.udpClient((camIP, UDP_PORT))
-        self.staticBack = None
-        self.diffLvl = 30       # Motion changed level which will be detected.(smaller->sensitive)
-        self.contourIgnRng = (400, 10000) # contour ingore range. target not in range will be ingnored.
+        self.paramDict = self.loadConfig()
+        self.client = udpCom.udpClient((self.paramDict['IPADD'], UDP_PORT))
+        self.staticBack = None 
         self.termiate = False   # program terminate flag
-        self.showDiff = False   # flag to whether to show the difference frame.
         self.frameRate = 10     
+
+#-----------------------------------------------------------------------------
+    def loadConfig(self):
+        """ load the config parameter from the config file."""
+        paramDict = {   'IPADD': '127.0.0.1', # IPaddress
+                        'FRATE': 10,    # display frame rate
+                        'DISMD': 0,     # 0:normal mode, 1:different gray-scale mode.
+                        'SENLV': 30,    # Motion changed level which will be detected.(smaller->sensitive)
+                        'TGMIN': 400,   # Min detected target range, target smaller than TGMIN will be ignore
+                        'TGMAX': 10000, # Max detected target range, target bigger than TGMIN will be ignore
+        }
+        with open(CONFIG_FILE, "r") as fh:
+            lines = fh.readlines()
+            for line in lines:
+                line = line.rstrip()
+                if line == '' or line[0] == '#': continue
+                key, val = line.split(':')
+                paramDict[key] = int(val) if key != 'IPADD' else val
+        return paramDict
 
 #-----------------------------------------------------------------------------
     def run(self):
@@ -69,7 +83,7 @@ class camServer(object):
             # if q entered whole process will stop 
             if cv2.waitKey(1) == ord('q'):
                 self.termiate = True 
-            time.sleep(1/FRAME_RT)
+            time.sleep(1/self.paramDict['FRATE'])
         # Destroying all the windows when user quit.        
         cv2.destroyAllWindows() 
 
@@ -91,19 +105,19 @@ class camServer(object):
         diffFrame = cv2.absdiff(self.staticBack, gray) 
         # If change in between static background and current frame is greater than 30 
         # it will show white color(255).
-        threshFrame = cv2.threshold(diffFrame, self.diffLvl, 255, cv2.THRESH_BINARY)[1] 
+        threshFrame = cv2.threshold(diffFrame, self.paramDict['FRATE'], 255, cv2.THRESH_BINARY)[1] 
         threshFrame = cv2.dilate(threshFrame, None, iterations = 2) 
         # Finding contour of moving object.
         cnts, _ = cv2.findContours(threshFrame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
         # old opencv version use the below line:
         # _, cnts, _ = cv2.findContours(threshFrame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) 
         for contour in cnts: 
-            if self.contourIgnRng[0]< cv2.contourArea(contour) < self.contourIgnRng[1]:
+            if self.paramDict['TGMIN']< cv2.contourArea(contour) < self.paramDict['TGMAX']:
                 (x, y, w, h) = cv2.boundingRect(contour) 
                 # Making green rectangles around the moving object.
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3) 
         # Show the difference compare frame or the detection tracking frame.
-        if self.showDiff:
+        if self.paramDict['DISMD']:
             cv2.imshow('Different Gray-Scale Image',diffFrame)
         else:
             cv2.imshow('Target Detection Image',frame)
@@ -111,8 +125,7 @@ class camServer(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    camIp = '127.0.0.1' if TEST_MD else '172.27.142.65'
-    cam = camServer(camIp)
+    cam = camServer(None)
     cam.run()
 
 #-----------------------------------------------------------------------------

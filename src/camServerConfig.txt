@@ -1,10 +1,19 @@
 # Camera server parameters configuration file. fmt: <Tag:val> 
 
 # Camera IP address. fmt: <IPADDR:(str)***.***.***.***>
-IPADDR:127.0.0.1
+IPADD:127.0.0.1
 
 # Video frame rate. fmt: <FRATE:(int)**>
 FRATE:10
 
-# Display mode. fmt:<DISMD:(int)**> 0:normal mode, 1:different mode.
+# Display mode. fmt:<DISMD:(int)**> 0:normal mode, 1:different gray-scale mode.
 DISMD:0
+
+# Sensitive level. fmt:<SENLV:(int)**> range(1-100) lower-> Sensitive
+SENLV:30
+
+# Min display target :<TGMIN:(int)**>
+TGMIN:400
+
+# MAX display target :<TGMIN:(int)**>
+TGMAX:10000
