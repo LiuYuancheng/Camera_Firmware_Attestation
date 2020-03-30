@@ -1,7 +1,7 @@
 # PATT server parameters configuration file. fmt: <Tag:val>
 
 # Client IP address. fmt: <IPADDR:(str)***.***.***.***>
-IPADD:127.0.0.1
+IPADD:172.27.140.126
 
 # PATT file split block number.fmt: <BLKNU:(int)**>
 BLKNU:4
