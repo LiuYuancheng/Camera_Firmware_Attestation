@@ -16,18 +16,34 @@ import udpCom
 import pattChecker as patt
 
 UDP_PORT = 5006
+CONFIG_FILE = 'pattClientConfig.txt'
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class pattClient(object):
-    def __init__(self, filePath=None):
+    def __init__(self, parent):
         """ Create a UDP server and feed back the checked file's PATT value 
             when the client connect to it.
-            Init example: checker = pattClient(filePath='firmwareSample')
+            Init example: checker = pattClient(None)
         """
-        blockNum = 4
-        self.tester = patt.pattChecker(blockNum, filePath)
+        self.paramDict = self.loadConfig()
+        self.tester = patt.pattChecker(self.paramDict['BLKNU'], self.paramDict['FMPAT'])
         self.server = udpCom.udpServer(None, UDP_PORT)
+
+    #-----------------------------------------------------------------------------
+    def loadConfig(self):
+        """ load the config parameter from the config file."""
+        paramDict = {   'BLKNU': 4,                 # display frame rate
+                        'FMPAT': 'firmwareSample',  # Checked firmware name
+        }
+        with open(CONFIG_FILE, "r") as fh:
+            lines = fh.readlines()
+            for line in lines:
+                line = line.rstrip()
+                if line == '' or line[0] == '#': continue
+                key, val = line.split(':')
+                paramDict[key] = int(val) if key == 'BLKNU' else val
+        return paramDict
 
     #-----------------------------------------------------------------------------
     def run(self):
@@ -47,7 +63,7 @@ class pattClient(object):
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
-    checker = pattClient(filePath='firmwareSample')
+    checker = pattClient(None)
     checker.run()
 
 #-----------------------------------------------------------------------------
