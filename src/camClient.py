@@ -35,8 +35,9 @@ class camClient(object):
             Init example : cam = camClient(videoSrc='VideoFilePath')
         """
         self.server = udpCom.udpServer(None, UDP_PORT)
-        print("Capture video from src: %s" % str(videoSrc))
-        self.cam = cv2.VideoCapture(videoSrc)
+        self.videoSrc = videoSrc
+        print("Capture video from src: %s" % str(self.videoSrc))
+        self.cam = cv2.VideoCapture(self.videoSrc)
         self.encodeParam = [int(cv2.IMWRITE_JPEG_QUALITY), 90] # image encode parameter
         self.setResolution(640, 480)
         self.data = None # image data.
@@ -57,6 +58,13 @@ class camClient(object):
         if msg == b'new':
             # read a new camera image data.
             _, image = self.cam.read()
+            if image is None:
+                print("Reload the image source.")
+                # reload the image source if can not read
+                self.cam.release()
+                self.cam = None
+                self.cam = cv2.VideoCapture(self.videoSrc)
+                _, image = self.cam.read()
             _, frame = cv2.imencode('.jpg', image, self.encodeParam)
             self.data = pickle.dumps(frame, 0)
             msg = str(len(self.data))   # Image size.
@@ -143,8 +151,6 @@ class udpServer(object):
 #--udpServer-------------------------------------------------------------------
     def serverStop(self):
         self.terminate = True
-
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
