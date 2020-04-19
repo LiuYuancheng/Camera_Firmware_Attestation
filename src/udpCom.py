@@ -10,10 +10,11 @@
 # Copyright:   
 # License:     
 #-----------------------------------------------------------------------------
-
+import time
 import socket
 
 BUFFER_SZ = 4096    # TCP buffer size.
+RESP_TIME = 0.01
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -36,16 +37,29 @@ class udpClient(object):
         if not isinstance(msg, bytes): msg = str(msg).encode('utf-8')
         self.client.sendto(msg, self.ipAddr)
         if resp:
-            data, _ = self.client.recvfrom(BUFFER_SZ)
-            return data
+            try:
+                self.client.settimeout(20)
+                data, _ = self.client.recvfrom(BUFFER_SZ)
+                return data
+            except ConnectionResetError as error:
+                print("udpClient: Can not connect to the server!")
+                print(error)
+                self.disconnect()
+                return None
         return None
 
 #--udpClient-------------------------------------------------------------------
     def disconnect(self):
         """ Send a empty logout message and close the socket."""
-        self.sendMsg(msg='')
-        self.client.close()
+        self.sendMsg('', resp=False)
+        time.sleep(RESP_TIME) # sleep very short while before close the socket to \
+        # make sure the server have enought time to handle the close method, when \
+        # server computer is fast, this is not a problem.
 
+        # Call shut down before close: https://docs.python.org/3/library/socket.html#socket.socket.shutdown
+        self.client.shutdown(socket.SHUT_RDWR)
+        self.client.close()
+        self.client = None
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class udpServer(object):

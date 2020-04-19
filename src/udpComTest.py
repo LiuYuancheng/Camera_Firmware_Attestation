@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Name:        udpComTest.py
 #
-# Purpose:     This module will provide a muti-thread test case program to test 
+# Purpose:     This module will provide a muti-thread test case program to test
 #              the UDP communication modules by using port 5005.
 #
 # Author:      Yuancheng Liu
@@ -67,10 +67,12 @@ def testCase(mode):
             tPass = tPass and (msg.encode('utf-8') == result)
         if tPass: tCount += 1
         print("Test passed: %s \n----\n" % str(tPass))
+
         # test case 1
         print("1. Client disconnect test:\n----")
         tPass = True
         client.disconnect()
+        client = None     
         try:
             client.sendMsg('Testdata', resp=True)
             tPass = False
@@ -78,15 +80,25 @@ def testCase(mode):
             tPass = True
         if tPass: tCount += 1
         print("Test passed: %s \n----\n" % str(tPass))
+        
         # test case 2
         print("2. Server stop test:\n----")
         servThread.stop()
+
         time.sleep(1)  # wait 1 second for all the sorcket close.
         tPass = (servThread.threadName is None)
         if tPass: tCount += 1
         print("Test passed: %s \n----\n" % str(tPass))
 
-        print(" => All test finished: %s/3" % str(tCount))
+        # test case 3
+        print("3. Client timeout test:\n----")
+        client = udpCom.udpClient(('127.0.0.1', UDP_PORT))
+        resp = client.sendMsg('Testdata', resp=True)
+        tPass = (resp is None)
+        if tPass: tCount += 1
+        print("Test passed: %s \n----\n" % str(tPass))
+
+        print(" => All test finished: %s/4" % str(tCount))
         client = servThread = None
     else:
         print("Add more other exception test here.")
