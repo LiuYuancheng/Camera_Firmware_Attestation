@@ -24,7 +24,7 @@ import udpCom
 
 UDP_PORT = 5005
 BUFFER_SZ = udpCom.BUFFER_SZ
-TEST_MD = True # Test mode flag
+TEST_MD = False # Test mode flag
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
