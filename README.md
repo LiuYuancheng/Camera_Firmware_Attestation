@@ -2,27 +2,43 @@
 
 > All rights reserved by NUS-Singtel Cyber Security R&D Lab (Jun 2016 to Jun 2021)
 
+**Program Design Purpose**: 
+
+We want to create a IOT target detection camera and demo the camera firmware attestation function to resistant the IOT firmware replacement attack by using the PATT(Physics-based Attestation of Control Systems) algo. 
+
+
+
 [TOC]
 
-#### 1. Introduction
+### Introduction
 
-This project contains two sections: 
+This project contains two main sections: 
 
-**Camera Detection** : In this section we will create a camera video/image capture program(client) running on raspberry PI and send the camera image to the motion detection programming(server) running on the computer which connected to the raspberry PI. 
+**IOT Camera Detection** : In this section we will build a IOT IP camera [Raspberry PI] with target/motion detection function.  The video/image capture program(client) running on Raspberry PI will send the camera image to the motion detection programming(server) running on the computer which connected in the same LAN. 
 
-**Firmware attestation**: In this section we will create a firmware checker and verifier program to do the firmware attestation by using PATT algorithm.  The check running in raspberry PI will calculate the camera firmware( camera Client) 's PATT value based on the random bytes address send from the verifier. The verifier will compare the firmware's PATT value with its local file's calculation result to give the attestation result. 
+**Firmware Update Attestation**: In this section we will create a firmware checker and a verifier program to do the firmware attestation by using PATT(Physics-based Attestation of Control Systems) algorithm.  The checker running in Raspberry PI will calculate the camera firmware (camera Client) 's PATT hash value based on the random bytes address send from the verifier. The verifier will compare the firmware's PATT value with its local file's calculation result to give the attestation result. 
 
-###### Test Situation and Program UI View
+**Demo Video Link**:  https://www.youtube.com/watch?v=nTv7dcfjZts
 
-![](doc/RM_testRun.gif)
+##### Test Situation and Program UI View
+
+We install the camera inside a train-railway module to detect train pass and provide signal for the railway cross barriers controller. 
+
+![](doc/img/RM_testRun.gif)
+
+##### Cyber Attack Scenario 
+
+**Firmware replacement attack**: Attack replaced the firmware update package with his malicious firmware program to make block the camera's video stream and send the pre-saved video (Normal simulation/train pass video) to the detection program then create the false feed back signal to the  railway cross barriers controller. 
+
+![](doc/img/RM_testSituation.png)
+
+`version: v_0.1`
 
 
-
-![](doc/RM_testSituation.png)
 
 ------
 
-#### 2. Program Setup
+### Program Setup
 
 ###### Development Environment
 
@@ -54,13 +70,17 @@ This project contains two sections:
 
 Raspberry PI3B+ with Camera module. https://projects.raspberrypi.org/en/projects/getting-started-with-picamera
 
-![](doc/RM_camera.jpg)
+![](doc/img/RM_camera.jpg)
+
+
 
 ------
 
-#### 3. System Design
+### System Design
 
-###### Communication Protocol 
+##### Communication Protocol 
+
+The system use UDP to do the camera video stream control and attestation checkout.
 
 | The camera client+server and the PATT check+verifier will communicate with each other by UDP with different port. |
 | ------------------------------------------------------------ |
@@ -69,9 +89,11 @@ Raspberry PI3B+ with Camera module. https://projects.raspberrypi.org/en/projects
 | PATT checker [ UDP server port: 5006]  <= Random address list <= PATT verifier [UDP client] |
 | PATT checker [ UDP server port: 5006]  => cameraClient PATT value => PATT verifier [UDP client] |
 
-![](doc/RM_comm.png)
+**Communication detail diagram is shown below**: 
 
-###### Program File List 
+![](doc/img/RM_comm.png)
+
+##### Program File List 
 
 | Program File    | Execution Env | Description                                                  |
 | --------------- | ------------- | ------------------------------------------------------------ |
@@ -85,25 +107,53 @@ Raspberry PI3B+ with Camera module. https://projects.raspberrypi.org/en/projects
 | firmwareSample  |               | firmware sample file used in test mode.                      |
 | my_video.h264   |               | H264 video used to show the attacked situation.              |
 
+
+
 ------
 
-#### 4. Program Usage
+### Program Usage/Execution
 
-###### Run the Program
+##### Run the Program
 
-Run the program on Raspberry PI : 
-
-```
-python cameraClient.py
-python pattClient.py
-```
-
-Run the program on Computer : 
+Run the program on `Raspberry PI` : 
 
 ```
-python cameraServer.py
-python pattServer.py
+IOT IP camera program: python cameraClient.py
+Attestation program checker: python pattClient.py
 ```
+
+Run the program on `Host Computer` : 
+
+```
+IOT camera targets detection program: python cameraServer.py
+Attestation program verifier: python pattServer.py
+```
+
+The Attestation program verifier will shown result as below: 
+
+![](doc/img/2022-01-29_173826.png)
+
+Detail usage please check the `Usage menu.pdf` in the doc folder. 
+
+
+
+------
+
+
+
+### Problem and Solution
+
+N.A
+
+------
+
+### Reference
+
+PATT firmware attestation: 
+
+https://www.usenix.org/system/files/raid2019-ghaeini.pdf
+
+
 
 
 
