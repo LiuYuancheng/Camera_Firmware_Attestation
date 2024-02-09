@@ -8,8 +8,8 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2019/01/15
-# Copyright:   
-# License:     
+# Copyright:   Copyright (c) 2019 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import time

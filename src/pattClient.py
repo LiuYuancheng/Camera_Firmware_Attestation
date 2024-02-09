@@ -7,9 +7,10 @@
 #              
 # Author:       Yuancheng Liu
 #
+# Version:     v_1.0.2
 # Created:     2020/03/16
-# Copyright:   YC @ Singtel Cyber Security Research & Development Laboratory
-# License:     YC
+# Copyright:   Copyright (c) 2020 LiuYuancheng
+# License:     MIT License
 #-----------------------------------------------------------------------------
 
 import udpCom

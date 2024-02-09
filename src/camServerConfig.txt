@@ -10,7 +10,7 @@ FRATE:10
 DISMD:0
 
 # Sensitive level. fmt:<SENLV:(int)**> range(1-100) lower-> Sensitive
-SENLV:30
+SENLV:10
 
 # Min display target :<TGMIN:(int)**>
 TGMIN:400

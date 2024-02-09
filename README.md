@@ -1,6 +1,4 @@
-# Camera Firmware Attestation
-
-> All rights reserved by NUS-Singtel Cyber Security R&D Lab (Jun 2016 to Jun 2021)
+# OT Cyber Attack Case Study [ Safety Camera Replay attack and Firmware Attestation]
 
 **Program Design Purpose**: 
 
