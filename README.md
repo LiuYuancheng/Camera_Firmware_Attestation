@@ -1,10 +1,12 @@
-# OT Cyber Attack Case Study [ Safety Camera Replay attack and Firmware Attestation]
+# OT Cyber Attack Case Study [Safety Camera Replay attack and Firmware Attestation]
 
-**Program Design Purpose**: 
+**Program Design Purpose**: The objective of this cyber attack case study is aim to develop a workshop using the train detection safety camera system and the dynamic firmware attestation algorithm introduced in paper [PAtt: Physics-based Attestation of Control Systems](https://www.usenix.org/system/files/raid2019-ghaeini.pdf) to illustrate a practical demonstration of replay attack on a safety surveillance camera in railway OT-system. In the attack scenario, the replay attack is a advanced OT system cyber attacker based on a successful camera firmware attack and the station docking area train detection camera in the train surveillance system which used as a double safety mechanism of the train detection sensor.  The attack scenario involves a red team attacker planted a malicious firmware in the train detection camera, capturing video footage from the camera,  replaying then sending it back to station control room to mess up the safety surveillance system and station operator.
 
-We want to create a IOT target detection camera and demo the camera firmware attestation function to resistant the IOT firmware replacement attack by using the PATT(Physics-based Attestation of Control Systems) algo. 
+![](doc/img/overview.png)
 
+**Attacker Vector** : Firmware Attack, Replay Attack
 
+>  Important : The demonstrated attack case is used for education and training for different level of IT-OT cyber security ICS course, please don't apply it on any real world system.
 
 [TOC]
 
