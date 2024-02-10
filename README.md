@@ -10,11 +10,37 @@
 
 [TOC]
 
+------
+
 ### Introduction
 
-This project contains two main sections: 
+This case study aims to develop a train detection surveillance camera which used as a double safety mechanism of the railway station's docking assistant system, then use the platform to demonstrate the potential replay attack impact of the system. This project contains two main sections: 
 
-**IOT Camera Detection** : In this section we will build a IOT IP camera [Raspberry PI] with target/motion detection function.  The video/image capture program(client) running on Raspberry PI will send the camera image to the motion detection programming(server) running on the computer which connected in the same LAN. 
+**Railway OT system station docking  assistant system** :  In our railway emulation system, we will develop a mechanism for the railway station operator the control the rail docking in the station. The system contents a double safety check mechanism both use the train position sensor and the train visual detection camera, when any of the 2 sensor detected a train is moving entering a station, it will active the train brake to slow down the train's speed. 
+
+**OT system replay attack demo** : this section will demo the red team attacker attack the railway docking double safety check mechanism via false data injection attack to the train position sensor-signal control Chain via false data injection (FCI) attack. Then mess up the safety camera detection system via firmware attack and the replay attack.
+
+
+
+#### Railway OT system station docking  assistant system 
+
+In our railway OT system at each station, there will be 2 different sensors (position sensor and camera) use detected a train is moving entering a station. The system workflow is shown below: 
+
+![](doc/img/dockingworkflow.png)
+
+The will be a position sensor and a train motion and object detection camera in the safety surveillance system. When a train is moving forward a station and enter the docking prepare range: 
+
+- The position and motion detection sensor which connect to the station control PLC will detect the train and PLC will send the train incoming signal to the station HMI. (As shown in the blue signal part in the work flow diagram)
+- The train objective detection train will send the train passing video the the train detection computer, the computer will use CV object detection algorism to detection the train and calculate the train speed, then send the related information to the HMI.  (As shown in the green signal part in the work flow diagram)
+- The HMI will process both the data from PLC and the train detection computer, check whether the train is slowing down and flow the station docking procedure. If it detected the train speed is higher than the design speed, it will active the train's brake.
+
+
+
+
+
+
+
+
 
 **Firmware Update Attestation**: In this section we will create a firmware checker and a verifier program to do the firmware attestation by using PATT(Physics-based Attestation of Control Systems) algorithm.  The checker running in Raspberry PI will calculate the camera firmware (camera Client) 's PATT hash value based on the random bytes address send from the verifier. The verifier will compare the firmware's PATT value with its local file's calculation result to give the attestation result. 
 
