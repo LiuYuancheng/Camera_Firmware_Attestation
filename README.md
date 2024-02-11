@@ -20,8 +20,6 @@ This case study aims to develop a train detection surveillance camera which used
 
 **OT system replay attack demo** : this section will demo the red team attacker attack the railway docking double safety check mechanism via false data injection attack to the train position sensor-signal control Chain via false data injection (FCI) attack. Then mess up the safety camera detection system via firmware attack and the replay attack.
 
-
-
 #### Railway OT system station docking  assistant system 
 
 In our railway OT system at each station, there will be 2 different sensors (position sensor and camera) use detected a train is moving entering a station. The system workflow is shown below: 
@@ -33,6 +31,68 @@ The will be a position sensor and a train motion and object detection camera in 
 - The position and motion detection sensor which connect to the station control PLC will detect the train and PLC will send the train incoming signal to the station HMI. (As shown in the blue signal part in the work flow diagram)
 - The train objective detection train will send the train passing video the the train detection computer, the computer will use CV object detection algorism to detection the train and calculate the train speed, then send the related information to the HMI.  (As shown in the green signal part in the work flow diagram)
 - The HMI will process both the data from PLC and the train detection computer, check whether the train is slowing down and flow the station docking procedure. If it detected the train speed is higher than the design speed, it will active the train's brake.
+
+
+
+#### OT System Surveillance Camera Replay Attack Demo
+
+As shown in the previous Railway OT system station docking  assistant system introduction workflow, there are 2 safety mechanism train motion detection sensor and train object detection camera. For the motion detection sensor which connect to PLC, the red attacker can modify its sensor state via false data injection attack, but for the train object detection camera, it is hard for hacker to modify the byte data in the video stream via man in the middle attack, so the hacker will implement a firmware attack to the camera to open a "backdoor" of the camera, then do the replay attack under below steps: 
+
+- Do a firmware attack to make the video camera runs a modified firmware with backdoor. 
+- Red team attacker use the camera back door record a video which only contents the railway without a train pass. 
+- When the attacker start the FDI attack on the PLC-HMI part, he also cut off the video steam send from the camera to the train detection camera video process computer , then replay send the pre-saved video recorded in previous step. 
+
+By using the FDI attack on the PLC and replay attack on the camera, the red team attack is able to mess up the station docking  assistant system which makes the station HMI and operator not able to detect the docking train to the station.
+
+
+
+#### Key Tactics, techniques, and procedures (TTP) of replay attack
+
+The tactics, techniques, and procedures (TTP) of a surveillance camera replay attack involve several steps that an attacker might take to intercept, manipulate, and replay video footage from a surveillance camera in an OT (Operational Technology) system. 
+
+**Reconnaissance**:
+
+- **Tactics**: Identify the target surveillance camera or cameras within the OT system.
+- **Techniques**: Gather information about the camera's make and model, location, network configuration, and any existing security measures.
+- **Procedures**: The red team attacker will scan the network service to find the video server host by the camera, based on the camera admin page to find the camera's model then understand some of the camera API. 
+
+**Interception and Analysis **: 
+
+- **Tactics**: Monitor the communication between the surveillance camera and the monitoring/recording system.
+- **Tactics**: Capture video footage and associated data packets as they are transmitted over the network.
+- **Procedures**: The red team attacker will analyze the the camera connection client detail to find the connected video process computer to identify the replay attack target. 
+
+**Replay**:
+
+- Replay the manipulated video footage to the monitoring/recording system or operators.
+- Ensure that the replayed footage aligns with the attacker's objectives, such as concealing unauthorized access, tampering, or other malicious activities.
+- **Procedures** : The red team attack will send the pre-saved fake video to the video process computer to mess up the train detection safety mechanism. 
+
+
+
+------
+
+### Background Knowledge
+
+
+
+#### Replay Attack
+
+In the OT System cyber attack, the replay attack is often used to attack the communication channel or control chain which use complex protocol and contents large data flow which is different to use the normal attach method such as  FDI/FCI or MItm. 
+
+A replay attack is a type of network attack in which an attacker captures a valid network transmission and then retransmit it later. **The main objective is to trick the system into accepting the retransmission of the data as a legitimate one.** Additionally, replay attacks are hazardous because it’s challenging to detect. Furthermore, it can be successful even if the original transmission was encrypted.
+
+An attacker can lunch a replay attack to gain unauthorized access to systems or networks. Furthermore, a replay attack can disrupt the regular operation of a system by inundating it with repeated requests. An attacker can plan to carry out this attack by intercepting and retransmitting data packets over a network. Additionally, a successful replay attack can be performed by replaying recorded audio or video transmissions.
+
+Reference : https://www.baeldung.com/cs/replay-attacks
+
+A replay attack on a camera in an OT (Operational Technology) system involves capturing video footage from the camera, altering it or replaying it, and then sending it back to deceive the system or its operators. This type of attack can have various implications depending on the specific application of the camera within the OT system. 
+
+
+
+![](doc/img/surveillanceSysDetail.png)
+
+
 
 
 
