@@ -74,7 +74,7 @@ The tactics, techniques, and procedures (TTP) of a surveillance camera replay at
 
 ### Background Knowledge
 
-
+In this section, we will introduce the basic knowledge of the replay attack and the Real Time Streaming Protocol we used to send the camera video to the image CV train detection computer.
 
 #### Replay Attack
 
@@ -84,41 +84,75 @@ A replay attack is a type of network attack in which an attacker captures a vali
 
 An attacker can lunch a replay attack to gain unauthorized access to systems or networks. Furthermore, a replay attack can disrupt the regular operation of a system by inundating it with repeated requests. An attacker can plan to carry out this attack by intercepting and retransmitting data packets over a network. Additionally, a successful replay attack can be performed by replaying recorded audio or video transmissions.
 
+A simple replay diagram is shown below: 
+
+![](doc/img/replayAttackDiagram.png)
+
 Reference : https://www.baeldung.com/cs/replay-attacks
 
 A replay attack on a camera in an OT (Operational Technology) system involves capturing video footage from the camera, altering it or replaying it, and then sending it back to deceive the system or its operators. This type of attack can have various implications depending on the specific application of the camera within the OT system. 
 
 
 
+#### Real Time Streaming Protocol
+
+To make the replay attack can be easily implemented, the video protocol we use for the camera is the RTSP (unencrypted).  
+
+The **Real-Time Streaming Protocol** (**RTSP**) is an [application-level](https://en.wikipedia.org/wiki/Application_layer) network [protocol](https://en.wikipedia.org/wiki/Communications_protocol) designed for [multiplexing](https://en.wikipedia.org/wiki/Multiplexing) and [packetizing](https://en.wikipedia.org/wiki/Network_packet#MPEG_packetized_stream) [multimedia](https://en.wikipedia.org/wiki/Multimedia) transport streams (such as [interactive media](https://en.wikipedia.org/wiki/Interactive_media), [video](https://en.wikipedia.org/wiki/Video) and [audio](https://en.wikipedia.org/wiki/Digital_audio)) over a suitable [transport protocol](https://en.wikipedia.org/wiki/Transport_layer). RTSP is used in entertainment and communications systems to control [streaming media](https://en.wikipedia.org/wiki/Streaming_media) [servers](https://en.wikipedia.org/wiki/Web_server). [RealNetworks](https://realnetworks.com/) developed RTSP in 1996, designed to control the entertainment and communication systems in a streaming server RTSP utilizes User Datagram Protocol ([UDP](https://getstream.io/blog/communication-protocols/#understanding-tcp-and-udp)) and Real-time Transport Protocol (RTP). RTSP is the standard [protocol used for streaming video](https://getstream.io/blog/streaming-protocols/) data from IP cameras and supports reliable segmented streaming, enabling users to watch streams while it's still being downloaded. The protocol also provides extensive customization options to help you build your own streaming applications and add new features. The main disadvantage of RTSP is that it isn't widely used for broadcasting multimedia over the Internet.
+
+An example of RTSP in action with the video and audio data being delivered over a separate UDP-based RTP stream is shown below 
+
+![](doc/img/rtsp.gif)
+
+The protocol is used for establishing and controlling media sessions between endpoints. Clients of media servers issue commands such as *play*, *record* and *pause*, to facilitate real-time control of the media streaming from the server to a client ([video on demand](https://en.wikipedia.org/wiki/Video_on_demand)) or from a client to the server. 
+
+Reference 
+
+https://www.informit.com/articles/article.aspx?p=169578&seqNum=3
+
+
+
+------
+
+### System Design 
+
+#### Railway OT system station docking  assistant system
+
+The train safety surveillance camera is build by using the raspberry PI3B+ with the camera module. In the real world model, before the railway station under the train slow down distance, there will be 2 thermal reflection sensors which connect to the PLC to detection the train, and next to the sensors, we installed our camera to detect the train. The camera will send the video stream to the video processing computer, our program will use the CV to do the motion and the train object detection.  
+
+The position of the camera and the sensor is shown below:
+
 ![](doc/img/surveillanceSysDetail.png)
 
+In the digital twin real world emulator, we did the same config. 
 
+When a train is passing the sensor and camera detection area: 
 
+PLC to convert the sensor electrical signal to digital signal and send to the HMI, HMI will show the train detection result and based on the detection time and train length calculate the train speed (speed-val-1). 
 
+The camera video processing computer's  motion detection program will trigger the train object detection algo to confirm the train is passing, then calculate the train speed (speed-val-2)
 
+If any of the 2 speed value speed-val-1and speed-val-2 is higher than the designed train docking speed, the station control HMI will send the train slow down signal to the train. 
 
-
-
-
-
-
-**Firmware Update Attestation**: In this section we will create a firmware checker and a verifier program to do the firmware attestation by using PATT(Physics-based Attestation of Control Systems) algorithm.  The checker running in Raspberry PI will calculate the camera firmware (camera Client) 's PATT hash value based on the random bytes address send from the verifier. The verifier will compare the firmware's PATT value with its local file's calculation result to give the attestation result. 
-
-**Demo Video Link**:  https://www.youtube.com/watch?v=nTv7dcfjZts
-
-##### Test Situation and Program UI View
-
-We install the camera inside a train-railway module to detect train pass and provide signal for the railway cross barriers controller. 
+The detail operation scenario is shown below : 
 
 ![](doc/img/RM_testRun.gif)
 
-##### Cyber Attack Scenario 
+ 
 
-**Firmware replacement attack**: Attack replaced the firmware update package with his malicious firmware program to make block the camera's video stream and send the pre-saved video (Normal simulation/train pass video) to the detection program then create the false feed back signal to the  railway cross barriers controller. 
+#### OT System Surveillance Camera Replay Attack Demo Design 
 
-![](doc/img/RM_testSituation.png)
+As shown in the previous Railway OT system station docking  assistant system introduction workflow, there are 2 safety mechanism train motion detection sensor and train object detection camera. For the motion detection sensor which connect to PLC, the red attacker can modify its sensor state via false data injection attack, but for the train object detection camera, it is hard for hacker to modify the byte data in the video stream via man in the middle attack, so the hacker will implement a firmware attack to the camera to open a "backdoor" of the camera, then do the replay attack under below steps: 
 
-`version: v_0.1`
+- Do a firmware attack to make the video camera runs a modified firmware with backdoor. 
+- Red team attacker use the camera back door record a video which only contents the railway without a train pass. 
+- When the attacker start the FDI attack on the PLC-HMI part, he also cut off the video steam send from the camera to the train detection camera video process computer , then replay send the pre-saved video recorded in previous step. 
+
+The detail attack flow is shown below:
+
+![](doc/img/attackFlow.png)
+
+By using the FDI attack on the PLC and replay attack on the camera, the red team attack is able to mess up the station docking  assistant system which makes the station HMI and operator not able to detect the docking train to the station.
 
 
 
@@ -160,25 +194,6 @@ Raspberry PI3B+ with Camera module. https://projects.raspberrypi.org/en/projects
 
 
 
-------
-
-### System Design
-
-##### Communication Protocol 
-
-The system use UDP to do the camera video stream control and attestation checkout.
-
-| The camera client+server and the PATT check+verifier will communicate with each other by UDP with different port. |
-| ------------------------------------------------------------ |
-| Camera client [ UDP server port: 5005]  <= image request <= Camera server [UDP client] |
-| Camera client [ UDP server port: 5005]  => encoded image => Camera server [UDP client] |
-| PATT checker [ UDP server port: 5006]  <= Random address list <= PATT verifier [UDP client] |
-| PATT checker [ UDP server port: 5006]  => cameraClient PATT value => PATT verifier [UDP client] |
-
-**Communication detail diagram is shown below**: 
-
-![](doc/img/RM_comm.png)
-
 ##### Program File List 
 
 | Program File    | Execution Env | Description                                                  |
@@ -199,7 +214,24 @@ The system use UDP to do the camera video stream control and attestation checkou
 
 ### Program Usage/Execution
 
+##### Communication Protocol 
+
+The system use UDP to do the camera video stream control and attestation checkout.
+
+| The camera client+server and the PATT check+verifier will communicate with each other by UDP with different port. |
+| ------------------------------------------------------------ |
+| Camera client [ UDP server port: 5005]  <= image request <= Camera server [UDP client] |
+| Camera client [ UDP server port: 5005]  => encoded image => Camera server [UDP client] |
+| PATT checker [ UDP server port: 5006]  <= Random address list <= PATT verifier [UDP client] |
+| PATT checker [ UDP server port: 5006]  => cameraClient PATT value => PATT verifier [UDP client] |
+
+**Communication detail diagram is shown below**: 
+
+![](doc/img/RM_comm.png)
+
 ##### Run the Program
+
+**Firmware Update Attestation**: In this section we will create a firmware checker and a verifier program to do the firmware attestation by using PATT(Physics-based Attestation of Control Systems) algorithm.  The checker running in Raspberry PI will calculate the camera firmware (camera Client) 's PATT hash value based on the random bytes address send from the verifier. The verifier will compare the firmware's PATT value with its local file's calculation result to give the attestation result. 
 
 Run the program on `Raspberry PI` : 
 
@@ -225,8 +257,6 @@ Detail usage please check the `Usage menu.pdf` in the doc folder.
 
 ------
 
-
-
 ### Problem and Solution
 
 N.A
@@ -235,13 +265,9 @@ N.A
 
 ### Reference
 
-PATT firmware attestation: 
-
-https://www.usenix.org/system/files/raid2019-ghaeini.pdf
-
-
-
-
+- PATT firmware attestation:  https://www.usenix.org/system/files/raid2019-ghaeini.pdf
+- RTSP video protocol: https://www.informit.com/articles/article.aspx?p=169578&seqNum=3
+- Replay attack :  https://www.baeldung.com/cs/replay-attacks
 
 ------
 
