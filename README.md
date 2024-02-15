@@ -1,4 +1,4 @@
-# OT Cyber Attack Case Study [ Safety Camera Replay attack and Firmware Attestation ]
+# OT Cyber Attack Case Study [ Safety Camera Replay Attack and Firmware Attestation ]
 
 **Program Design Purpose**: The objective of this cyber attack case study is to develop a workshop aimed at showcasing a practical demonstration of a replay attack on a station train docking safety surveillance camera within a railway OT-system. In the attack scenario, the replay attack is executed by a sophisticated cyber attacker within the OT system, exploiting a successful camera firmware attack. Specifically, the attack targets the train detection camera located in the station docking area, which serves as a crucial safety mechanism for the train surveillance system. The scenario involves a red team attacker implanting malicious firmware into the train detection camera, thereby compromising its functionality. This compromised camera is then used to capture video footage, which is subsequently replayed and sent back to the station control room. The goal of this attack is to disrupt the safety surveillance system and deceive the station operator, highlighting the vulnerabilities inherent in OT systems and the potential impact of cyber attacks on critical infrastructure.
 
@@ -92,22 +92,22 @@ By combining the false data injection attack on the PLC and the replay attack on
 
 The tactics, techniques, and procedures (TTP) of a surveillance camera replay attack involve several steps that an attacker might take to intercept, manipulate, and replay video footage from a surveillance camera in an OT (Operational Technology) system. 
 
-**Reconnaissance**:
+**Reconnaissance**
 
 - **Tactics**: Identify the target surveillance camera or cameras within the OT system.
 - **Techniques**: Gather information about the camera's make and model, location, network configuration, and any existing security measures.
 - **Procedures**: The red team attacker will scan the network service to find the RTSP video server host by the camera, based on the camera admin page to find the camera's model then find some of the camera API from online document. 
 
-**Interception and Analysis **: 
+**Interception and Analysis**
 
 - **Tactics**: Monitor the communication between the surveillance camera and the monitoring/recording system.
 - **Tactics**: Capture video footage and associated data packets as they are transmitted over the network.
 - **Procedures**: The red team attacker will analyze the the camera connection packets detail to find the connected video process computer to identify the replay attack target. 
 
-**Replay**:
+**Replay**
 
-- Replay the manipulated video footage to the monitoring/recording system or operators.
-- Ensure that the replayed footage aligns with the attacker's objectives, such as concealing unauthorized access, tampering, or other malicious activities.
+- **Tactics**: Replay the manipulated video footage to the monitoring/recording system or operators.
+- **Tactics**: Ensure that the replayed footage aligns with the attacker's objectives, such as concealing unauthorized access, tampering, or other malicious activities.
 - **Procedures** : The red team attack will send the pre-saved fake video to the video process computer to mess up the train detection safety mechanism. 
 
 
@@ -286,7 +286,7 @@ Attestation program verifier: python pattServer.py
 
 The Attestation program verifier will shown result as below: 
 
-![](doc/img/2022-01-29_173826.png)
+![](doc/img/pattRst.png)
 
 Detail usage please check the `Usage menu.pdf` in the doc folder. 
 
