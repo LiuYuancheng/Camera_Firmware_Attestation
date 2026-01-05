@@ -12,6 +12,16 @@ The attack progress overview diagram is shown below :
 
 Demo video : https://youtu.be/nTv7dcfjZts?si=h-ptx8jN6Gs1Q1JK
 
+```python
+# Author:      Yuancheng Liu
+# Created:     2024/03/21
+# Version:     v_0.1.3
+# Copyright:   Copyright (c) 2024 LiuYuancheng
+# License:     MIT License
+```
+
+
+
 **Table of Contents**
 
 [TOC]
@@ -308,4 +318,4 @@ N.A
 
 ------
 
-> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 26/03/2020, , if you have any problem please free to message me.
+> Last edit by LiuYuancheng(liu_yuan_cheng@hotmail.com) at 26/03/2024, , if you have any problem please free to message me.
